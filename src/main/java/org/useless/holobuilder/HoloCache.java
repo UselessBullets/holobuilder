@@ -1,6 +1,5 @@
 package org.useless.holobuilder;
 
-import com.google.common.collect.ImmutableMap;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.render.LightmapHelper;
 import net.minecraft.core.block.Block;

@@ -9,8 +9,8 @@ import net.minecraft.core.util.helper.MathHelper;
 
 import java.util.Locale;
 
-public class SphereCommand extends ClientCommand {
-	public SphereCommand(Minecraft minecraft) {
+public class HoloCommand extends ClientCommand {
+	public HoloCommand(Minecraft minecraft) {
 		super(minecraft, "hologram", "holo");
 	}
 
@@ -19,6 +19,7 @@ public class SphereCommand extends ClientCommand {
 		if (strings.length < 1) return false;
 		String subCommand = strings[0];
 		switch (subCommand.toLowerCase(Locale.ROOT)){
+			case "clear":
 			case "reset":
 				HoloBuilder.holoCache.resetData();
 				return true;
@@ -104,14 +105,14 @@ public class SphereCommand extends ClientCommand {
 							try {
 								color = Long.decode(strings[1]);
 							} catch (NumberFormatException n){
-								return false;
+								throw n;
 							}
 						}
 					}
+					HoloBuilder.a = ((color & 0xFF000000) >> 24)/255f;
 					HoloBuilder.r = ((color & 0x00FF0000) >> 16 )/255f;
 					HoloBuilder.g = ((color & 0x0000FF00) >> 8 )/255f;
 					HoloBuilder.b = ((color & 0x000000FF) >> 0)/255f;
-					HoloBuilder.a = ((color & 0xFF000000) >> 24)/255f;
 					if (HoloBuilder.a == 0) HoloBuilder.a = 1f;
 					return true;
 				}
@@ -122,6 +123,41 @@ public class SphereCommand extends ClientCommand {
 				HoloBuilder.a = Float.parseFloat(strings[4]);
 				return true;
 			}
+			case "line":
+				if (strings.length < 4) return false;
+				int x1;
+				int y1;
+				int z1;
+				int x2;
+				int y2;
+				int z2;
+				int blockId = Block.glass.id;
+				int meta = 0;
+				if (strings.length < 7){
+					x1 = MathHelper.floor_double(commandSender.getPlayer().x);
+					y1 = MathHelper.floor_double(commandSender.getPlayer().y - commandSender.getPlayer().bbHeight);
+					z1 = MathHelper.floor_double(commandSender.getPlayer().z);
+					x2 = Integer.parseInt(strings[1]);
+					y2 = Integer.parseInt(strings[2]);
+					z2 = Integer.parseInt(strings[3]);
+					if (strings.length == 6){
+						blockId = Integer.parseInt(strings[4]);
+						meta = Integer.parseInt(strings[5]);
+					}
+				} else {
+					x1 = Integer.parseInt(strings[1]);
+					y1 = Integer.parseInt(strings[2]);
+					z1 = Integer.parseInt(strings[3]);
+					x2 = Integer.parseInt(strings[4]);
+					y2 = Integer.parseInt(strings[5]);
+					z2 = Integer.parseInt(strings[6]);
+					if (strings.length >= 9){
+						blockId = Integer.parseInt(strings[7]);
+						meta = Integer.parseInt(strings[8]);
+					}
+				}
+				HoloBuilder.addLine(x1, y1, z1, x2, y2, z2, blockId, meta);
+				return true;
 			default:
 				return false;
 		}
@@ -142,6 +178,11 @@ public class SphereCommand extends ClientCommand {
 		sender.sendMessage("/hologram cube <xSize> <ySize> <zSize> <id> <meta>");
 		sender.sendMessage("/hologram cube <x> <y> <z> <xSize> <ySize> <zSize>");
 		sender.sendMessage("/hologram cube <x> <y> <z> <xSize> <ySize> <zSize> <id> <meta>");
+
+		sender.sendMessage("/hologram line <x2> <y2> <z2>");
+		sender.sendMessage("/hologram line <x2> <y2> <z2> <id> <meta>");
+		sender.sendMessage("/hologram line <x1> <y1> <z2> <x2> <y2> <z2>");
+		sender.sendMessage("/hologram line <x1> <y1> <z2> <x2> <y2> <z2> <id> <meta>");
 
 		sender.sendMessage("/hologram sphere <radius>");
 		sender.sendMessage("/hologram sphere <x> <y> <z> <radius>");

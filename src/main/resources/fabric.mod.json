@@ -4,7 +4,7 @@
   "version": "${version}",
 
   "name": "Holo Builder",
-  "description": "",
+  "description": "A basic build assistance tool",
   "authors": [
     "Useless"
   ],

@@ -29,7 +29,7 @@ public class HoloBuilder implements ModInitializer {
 	public static double holoRenderDist = 30 * 30;
     @Override
     public void onInitialize() {
-		CommandHelper.createClientCommand((mc) -> new SphereCommand(mc.get()));
+		CommandHelper.createClientCommand((mc) -> new HoloCommand(mc.get()));
         LOGGER.info("HoloBuilder initialized.");
     }
 
@@ -58,6 +58,43 @@ public class HoloBuilder implements ModInitializer {
 					holoCache.setBlock(originX + x * signX, originY + y * signY, originZ + z * signZ, blockId, meta);
 				}
 			}
+		}
+	}
+	public static void addLine(int x1, int y1, int z1, int x2, int y2, int z2, int blockId, int meta){
+		int minX = Math.min(x1, x2);
+		int minY = Math.min(y1, y2);
+		int minZ = Math.min(z1, z2);
+		int maxX = Math.max(x1, x2);
+		int maxY = Math.max(y1, y2);
+		int maxZ = Math.max(z1, z2);
+		double diffX = x2 - x1;
+		double diffY = y2 - y1;
+		double diffZ = z2 - z1;
+		holoCache.setBlock(x1, y1, z1, blockId, meta);
+		holoCache.setBlock(x2, y2, z2, blockId, meta);
+		double length = Math.sqrt(diffX * diffX + diffY * diffY + diffZ * diffZ);
+		double mx = diffX / length;
+		double my = diffY / length;
+		double mz = diffZ / length;
+		double dist = 0;
+		while (dist < length){
+			double nx = x1 + mx * dist;
+			double ny = y1 + my * dist;
+			double nz = z1 + mz * dist;
+			if (nx < minX || nx > maxX) break;
+			if (ny < minY || ny > maxY) break;
+			if (nz < minZ || nz > maxZ) break;
+			int blockX = MathHelper.floor_double(nx);
+			int blockY = MathHelper.floor_double(ny);
+			int blockZ = MathHelper.floor_double(nz);
+//			double _x = (blockX + 0.5) - nx;
+//			double _y = (blockY + 0.5) - ny;
+//			double _z = (blockZ + 0.5) - nz;
+//            if (_x * _y + _y * _y + _z * _z <= 0.75 * 0.75) {
+//                holoCache.setBlock(blockX, blockY, blockZ, blockId, meta);
+//            }
+			holoCache.setBlock(blockX, blockY, blockZ, blockId, meta);
+            dist += 1;
 		}
 	}
 	public static void render(Minecraft mc, float partialTick){
